@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>मेरा पहला मोबाइल गेम</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #1a1a2e;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+    h2 {
+      margin: 10px 0;
+      color: #00ffcc;
+    }
+    #scoreBoard {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #ffd700;
+    }
+    canvas {
+      background-color: #16213e;
+      border: 3px solid #00ffcc;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto;
+    }
+    p {
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎮 बॉल कैच गेम 🎮</h2>
+  <div id="scoreBoard">स्कोर (Score): 0</div>
+  <canvas id="gameCanvas" width="320" height="420"></canvas>
+  <p>नीचे नीली प्लेट को उंगली से दाएं-बाएं खिसकाएं!</p>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const scoreText = document.getElementById("scoreBoard");
+
+    let score = 0;
+    let paddleX = 120;
+    const paddleWidth = 80;
+    const paddleHeight = 14;
+
+    let ballX = Math.random() * 280 + 20;
+    let ballY = 0;
+    let ballSpeed = 3.5;
+
+    // मोबाइल टच से प्लेट को हिलाने का कोड
+    canvas.addEventListener("touchmove", function(e) {
+      let touch = e.touches[0];
+      let rect = canvas.getBoundingClientRect();
+      paddleX = touch.clientX - rect.left - paddleWidth / 2;
+      
+      if (paddleX < 0) paddleX = 0;
+      if (paddleX > canvas.width - paddleWidth) paddleX = canvas.width - paddleWidth;
+    });
+
+    function drawGame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // नीली प्लेट (Paddle) बनाएं
+      ctx.fillStyle = "#00ffcc";
+      ctx.fillRect(paddleX, canvas.height - 25, paddleWidth, paddleHeight);
+
+      // लाल गेंद (Ball) बनाएं
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, 12, 0, Math.PI * 2);
+      ctx.fillStyle = "#ff2e63";
+      ctx.fill();
+      ctx.closePath();
+
+      // गेंद को नीचे गिराएं
+      ballY += ballSpeed;
+
+      // चेक करें कि गेंद प्लेट से टकराई या नहीं
+      if (
+        ballY + 12 >= canvas.height - 25 &&
+        ballX >= paddleX &&
+        ballX <= paddleX + paddleWidth
+      ) {
+        score++;
+        scoreText.innerText = "स्कोर (Score): " + score;
+        ballY = 0;
+        ballX = Math.random() * 280 + 20;
+        ballSpeed += 0.2; // हर स्कोर पर गेम थोड़ा तेज़ होगा
+      }
+
+      // अगर गेंद नीचे गिर गई तो गेम रीसेट करें
+      if (ballY > canvas.height) {
+        alert("गेम ओवर! आपका कुल स्कोर: " + score);
+        score = 0;
+        ballSpeed = 3.5;
+        scoreText.innerText = "स्कोर (Score): 0";
+        ballY = 0;
+        ballX = Math.random() * 280 + 20;
+      }
+
+      requestAnimationFrame(drawGame);
+    }
+
+    drawGame();
+  </script>
+
+</body>
+</html>
